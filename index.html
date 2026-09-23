@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<!-- 告诉浏览器这是 HTML5 文档 -->
+<html lang="zh-CN">
+<head>
+  <!-- 设置字符编码，避免中文乱码 -->
+  <meta charset="UTF-8" />
+  <!-- 让页面在手机上也能正常缩放显示 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星语留言板</title>
+
+  <!-- 样式部分：全部写在 <style> 标签里，不需要额外的 CSS 文件 -->
+  <style>
+    /* ===== 整体主题：蓝紫色梦幻星空 ===== */
+
+    /* 清除浏览器给元素加的默认外边距，方便我们自己控制布局 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box; /* 让 padding 不会把元素撑大 */
+    }
+
+    body {
+      /* 深蓝紫到紫色的对角渐变背景 */
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      min-height: 100vh; /* 至少占满一整屏 */
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      color: #e8e6ff; /* 浅紫白文字，在深色背景上柔和不刺眼 */
+      padding: 32px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 用 CSS 画两个发光的彩色光斑，营造星空氛围（纯样式，不需要图片） */
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px); /* 模糊处理，变成柔和光晕 */
+      opacity: 0.45;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body::before {
+      width: 420px;
+      height: 420px;
+      background: #7c3aed; /* 紫色光斑 */
+      top: -120px;
+      left: -100px;
+    }
+    body::after {
+      width: 380px;
+      height: 380px;
+      background: #4f7cff; /* 蓝色光斑 */
+      bottom: -120px;
+      right: -80px;
+    }
+
+    /* 页面内容容器：限制最大宽度并居中 */
+    .container {
+      position: relative;
+      z-index: 1; /* 保证内容在光斑之上 */
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ===== 标题 ===== */
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .header h1 {
+      font-size: 32px;
+      letter-spacing: 4px; /* 字间距 */
+      /* 文字发光效果，像星星一样 */
+      text-shadow: 0 0 18px rgba(167, 139, 250, 0.8),
+                   0 0 40px rgba(124, 58, 237, 0.5);
+    }
+    .header p {
+      margin-top: 8px;
+      color: #a5a0d6;
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+
+    /* ===== 玻璃拟态卡片（表单和列表都用这个风格）===== */
+    .card {
+      background: rgba(255, 255, 255, 0.07); /* 半透明白 */
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 24px;
+      /* 背景模糊，透出后面的光斑，就是"毛玻璃"效果 */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      margin-bottom: 24px;
+    }
+
+    /* ===== 表单 ===== */
+    .field {
+      margin-bottom: 16px;
+    }
+    .field label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #c7c2f5;
+    }
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(15, 12, 41, 0.5); /* 深色半透明输入框 */
+      color: #f0eeff;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    /* 输入框获得焦点（点进去）时，边框变成紫色并发光，提示用户正在输入 */
+    .field input:focus,
+    .field textarea:focus {
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.25);
+    }
+    .field textarea {
+      resize: vertical; /* 只允许上下调整大小 */
+      min-height: 90px;
+    }
+    /* 占位提示文字的颜色 */
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #6f6a9e;
+    }
+
+    /* 提交按钮：蓝紫渐变 + 发光 */
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      letter-spacing: 3px;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(135deg, #7c3aed 0%, #4f7cff 100%);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+    }
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px); /* 鼠标悬停时微微上浮 */
+      box-shadow: 0 10px 28px rgba(124, 58, 237, 0.6);
+    }
+    /* 按钮被按下的瞬间缩小一点点，有"按压感" */
+    .submit-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    /* 提交中禁用按钮，防止重复点击 */
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* 错误提示条（后端没启动等情况下显示） */
+    .alert {
+      display: none; /* 默认隐藏，需要时用 JS 显示 */
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fda4af;
+    }
+    .alert.show {
+      display: block;
+    }
+
+    /* ===== 留言列表 ===== */
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px; /* 星星图标和文字的间距 */
+    }
+    .section-title .count {
+      font-size: 13px;
+      color: #a78bfa;
+      background: rgba(167, 139, 250, 0.15);
+      border-radius: 999px;
+      padding: 2px 10px;
+    }
+
+    .message-list {
+      list-style: none; /* 去掉列表默认的小圆点 */
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* 单条留言卡片 */
+    .message-item {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-left: 3px solid #a78bfa; /* 左侧紫色小边条作为点缀 */
+      border-radius: 14px;
+      padding: 14px 16px;
+      animation: fadeInUp 0.4s ease both; /* 新留言出现时的淡入动画 */
+    }
+    .message-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .message-nickname {
+      font-weight: bold;
+      color: #c4b5fd;
+      font-size: 15px;
+    }
+    .message-id {
+      font-size: 12px;
+      color: #6f6a9e;
+    }
+    .message-content {
+      font-size: 15px;
+      line-height: 1.7; /* 行高，多行文字更易读 */
+      color: #eceaff;
+      /* 长单词或超长内容也要自动换行，不能撑破卡片 */
+      word-break: break-word;
+      white-space: pre-wrap; /* 保留用户输入的换行 */
+    }
+
+    /* 空状态 / 加载中提示 */
+    .tip {
+      text-align: center;
+      color: #8b86c2;
+      font-size: 14px;
+      padding: 24px 0;
+    }
+
+    /* 留言淡入动画：从下方轻微上浮并逐渐显现 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 手机窄屏时缩小标题 */
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 26px;
+      }
+      .card {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- 标题区 -->
+    <div class="header">
+      <h1>✦ 星语留言板 ✦</h1>
+      <p>写下此刻，让星星替你记住</p>
+    </div>
+
+    <!-- 留言表单卡片 -->
+    <div class="card">
+      <!-- 错误提示，默认隐藏 -->
+      <div id="errorBox" class="alert"></div>
+
+      <!-- form 标签的作用：用户按回车或点按钮时会触发 submit 事件 -->
+      <form id="messageForm">
+        <div class="field">
+          <label for="nickname">昵称</label>
+          <input
+            type="text"
+            id="nickname"
+            placeholder="给自己起个名字吧～"
+            maxlength="20"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="content">留言内容</label>
+          <textarea
+            id="content"
+            placeholder="想说点什么呢？"
+            maxlength="500"
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          发送留言
+        </button>
+      </form>
+    </div>
+
+    <!-- 留言列表卡片 -->
+    <div class="card">
+      <div class="section-title">
+        <span>🌌 全部留言</span>
+        <span class="count" id="msgCount">0</span>
+      </div>
+      <ul class="message-list" id="messageList">
+        <!-- 留言会由 JavaScript 动态插入到这里 -->
+        <li class="tip" id="loadingTip">正在加载星光…</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- JavaScript 部分：负责和后端通信、操作页面 -->
+  <script>
+    // 后端接口的基础地址（结尾不要带斜杠）
+    const API_URL = "http://localhost:8000/api/messages";
+
+    // 通过 id 从页面上找到各个元素，方便后面操作
+    const form = document.getElementById("messageForm");
+    const nicknameInput = document.getElementById("nickname");
+    const contentInput = document.getElementById("content");
+    const submitBtn = document.getElementById("submitBtn");
+    const messageList = document.getElementById("messageList");
+    const msgCount = document.getElementById("msgCount");
+    const errorBox = document.getElementById("errorBox");
+
+    // 显示错误信息（比如后端没启动）
+    function showError(text) {
+      errorBox.textContent = text;
+      errorBox.classList.add("show"); // 加上 show 类，CSS 会让它显示出来
+    }
+
+    // 隐藏错误信息
+    function hideError() {
+      errorBox.classList.remove("show");
+    }
+
+    // 渲染留言列表：把后端返回的数组变成页面上的一个个卡片
+    function renderMessages(messages) {
+      // 先清空列表里旧的内容
+      messageList.innerHTML = "";
+
+      // 更新右上角的留言数量
+      msgCount.textContent = messages.length;
+
+      // 如果一条留言都没有，显示空状态提示
+      if (messages.length === 0) {
+        const emptyTip = document.createElement("li");
+        emptyTip.className = "tip";
+        emptyTip.textContent = "还没有留言，来做第一个摘星的人吧 ✨";
+        messageList.appendChild(emptyTip);
+        return;
+      }
+
+      // 遍历留言数组，每条生成一个 <li>
+      messages.forEach(function (msg) {
+        const item = document.createElement("li");
+        item.className = "message-item";
+
+        // 头部：昵称 + 编号
+        const head = document.createElement("div");
+        head.className = "message-head";
+
+        const nickname = document.createElement("span");
+        nickname.className = "message-nickname";
+        // 重点：用 textContent 而不是 innerHTML 设置文字，
+        // 这样即使用户输入 <script> 等内容也只会被当普通文字显示，
+        // 不会被执行，避免 XSS 攻击。
+        nickname.textContent = msg.nickname;
+
+        const id = document.createElement("span");
+        id.className = "message-id";
+        id.textContent = "#" + msg.id;
+
+        head.appendChild(nickname);
+        head.appendChild(id);
+
+        // 正文：留言内容
+        const content = document.createElement("div");
+        content.className = "message-content";
+        content.textContent = msg.content;
+
+        item.appendChild(head);
+        item.appendChild(content);
+        messageList.appendChild(item);
+      });
+    }
+
+    // 调用 GET 接口，加载所有留言
+    async function loadMessages() {
+      try {
+        // fetch 是浏览器内置的发请求工具
+        const res = await fetch(API_URL);
+        if (!res.ok) {
+          // res.ok 为 true 表示状态码是 2xx，否则说明服务器出错了
+          throw new Error("服务器返回了错误：" + res.status);
+        }
+        const data = await res.json(); // 把返回的 JSON 转成 JS 数组
+        hideError();
+        renderMessages(data);
+      } catch (err) {
+        // 网络错误（后端没启动、地址写错等）会走到这里
+        messageList.innerHTML = "";
+        msgCount.textContent = "0";
+        const tip = document.createElement("li");
+        tip.className = "tip";
+        tip.textContent = "留言加载失败";
+        messageList.appendChild(tip);
+        showError("无法连接后端服务，请确认已运行：uvicorn main:app --reload");
+      }
+    }
+
+    // 监听表单的 submit 事件（点"发送留言"或在输入框按回车时触发）
+    form.addEventListener("submit", async function (event) {
+      // 重要：阻止表单默认的"刷新页面提交"行为，
+      // 我们要用 JavaScript 在不刷新页面的情况下发请求（AJAX）
+      event.preventDefault();
+      hideError();
+
+      // 拿到用户输入的值，并用 trim 去掉首尾空格
+      const nickname = nicknameInput.value.trim();
+      const content = contentInput.value.trim();
+
+      // 简单的空值检查（虽然 input 上已有 required，这里再保险一次）
+      if (!nickname || !content) {
+        showError("昵称和内容都不能为空哦");
+        return;
+      }
+
+      // 提交期间禁用按钮并改文字，防止用户重复点击发多条
+      submitBtn.disabled = true;
+      submitBtn.textContent = "发送中…";
+
+      try {
+        // 用 POST 方法把留言发给后端
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            // 告诉后端：我发的是 JSON 格式的数据
+            "Content-Type": "application/json",
+          },
+          // JSON.stringify 把 JS 对象转成 JSON 字符串：
+          // 字段名 nickname / content 必须和后端 MessageIn 定义的完全一致
+          body: JSON.stringify({
+            nickname: nickname,
+            content: content,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("提交失败：" + res.status);
+        }
+
+        // 提交成功：清空输入框，并重新加载列表
+        nicknameInput.value = "";
+        contentInput.value = "";
+        await loadMessages();
+      } catch (err) {
+        showError("发送失败，请确认后端服务已启动");
+      } finally {
+        // 无论成功失败，都恢复按钮可点击
+        submitBtn.disabled = false;
+        submitBtn.textContent = "发送留言";
+      }
+    });
+
+    // 页面刚打开时，立即加载一次已有留言
+    loadMessages();
+  </script>
+</body>
+</html>
