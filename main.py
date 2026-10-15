@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 # 引入 CORS 中间件，用来允许前端页面跨域调用本接口
 from fastapi.middleware.cors import CORSMiddleware
+# sqlite3 是 Python 自带的工具，不需要 pip install，也不需要装额外软件
+import sqlite3
 
 # 创建一个 FastAPI 应用实例，整个后端服务都围绕它来写
 app = FastAPI()
@@ -20,25 +22,54 @@ app.add_middleware(
     allow_headers=["*"],       # 允许所有请求头
 )
 
-# 用一个普通的 Python 列表来存留言。
-# 因为只是存在内存里，所以程序一重启，留言就没了（满足"不用数据库"的要求）
-messages = []
+# 数据库文件路径。sqlite3 不需要服务器进程，它就是一个普通文件（messages.db）。
+# 重启电脑、重启 uvicorn，这个文件里的数据都不会丢。
+DB_PATH = "messages.db"
+
+
+def init_db():
+    """启动时检查并创建留言表。如果表已经存在就跳过，不会重复创建。"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增编号，每插入一条自动加 1
+            nickname TEXT NOT NULL,               -- 昵称，不能是空
+            content  TEXT NOT NULL,               -- 内容，不能是空
+            mood     INTEGER NOT NULL DEFAULT 3   -- 心情指数 1-5，默认 3（平静）
+        )
+    """)
+    conn.commit()   # 确认刚才的建表操作（写入磁盘）
+    conn.close()    # 关闭连接（好习惯）
+
+
+# 程序一启动就立刻初始化数据库，保证表存在
+init_db()
 
 
 # 定义"一条留言"的数据结构
 # 继承 BaseModel 后，FastAPI 会自动帮你做数据校验
-# 比如客户端少传了字段，或者类型不对，它会直接返回清晰的错误提示
 class MessageIn(BaseModel):
     nickname: str   # 昵称，必须是字符串
     content: str    # 留言内容，必须是字符串
+    mood: int = 3   # 心情指数 1-5，默认 3（平静）
 
 
 # GET /api/messages：获取所有留言
 # 访问这个地址时，FastAPI 会调用下面的函数，把所有留言返回给客户端
 @app.get("/api/messages")
 def get_messages():
-    # 直接返回列表，FastAPI 会自动把它转成 JSON 格式
-    return messages
+    # 连接到数据库文件，读取所有留言
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.execute(
+        "SELECT id, nickname, content, mood FROM messages ORDER BY id"
+    )
+    rows = cursor.fetchall()   # 拿到所有结果，每行是一个元组 (id, nickname, content, mood)
+    conn.close()
+    # 把数据库返回的"元组列表"转换成前端期望的"字典列表"
+    return [
+        {"id": row[0], "nickname": row[1], "content": row[2], "mood": row[3]}
+        for row in rows
+    ]
 
 
 # POST /api/messages：提交一条新留言
@@ -46,13 +77,15 @@ def get_messages():
 # 并按 MessageIn 的结构校验它，校验通过后传给函数
 @app.post("/api/messages")
 def add_message(message: MessageIn):
-    # 把这条留言整理成一个字典，加一个 id 方便以后区分
-    new_message = {
-        "id": len(messages) + 1,        # 用当前留言数量+1 作为简单编号
-        "nickname": message.nickname,  # 从请求里取昵称
-        "content": message.content,    # 从请求里取内容
-    }
-    # 把新留言追加到内存列表里
-    messages.append(new_message)
+    conn = sqlite3.connect(DB_PATH)
+    # "?" 是占位符，sqlite3 会自动把你传的字符串安全地填进去，
+    # 防止有人输入恶意内容破坏数据库（这叫"SQL 注入"防护）
+    cursor = conn.execute(
+        "INSERT INTO messages (nickname, content, mood) VALUES (?, ?, ?)",
+        (message.nickname, message.content, message.mood),
+    )
+    conn.commit()               # 把新留言真正写入数据库文件
+    new_id = cursor.lastrowid   # 获取数据库自动分配的 id
+    conn.close()
     # 返回这条刚创建的留言，方便客户端确认
-    return new_message
+    return {"id": new_id, "nickname": message.nickname, "content": message.content, "mood": message.mood}
