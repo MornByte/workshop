@@ -240,6 +240,28 @@
       word-break: break-word;
       white-space: pre-wrap;
     }
+    /* 昵称右边的小区域：编号 + 删除按钮 */
+    .message-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .delete-btn {
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      background: rgba(244, 63, 94, 0.08);
+      color: #e11d48;
+      border-radius: 999px;
+      padding: 3px 11px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .delete-btn:hover:not(:disabled) {
+      background: rgba(244, 63, 94, 0.18);
+      transform: translateY(-1px);
+    }
+    .delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* 不同心情给卡片左侧加一条色带，一眼区分情绪 */
     .mood-1 { border-left: 5px solid #7eb8ff; }   /* 难过：蓝 */
@@ -311,7 +333,7 @@
     <!-- 心情列表 -->
     <div class="card">
       <div class="section-title">
-        <span>� 大家的心情</span>
+        <span>💬 大家的心情</span>
         <span class="count" id="msgCount">0</span>
       </div>
       <ul class="message-list" id="messageList">
@@ -402,8 +424,21 @@
         id.className = "message-id";
         id.textContent = "#" + msg.id;
 
+        // 删除按钮：把留言 id 存在 data-id 上，点击时再读取
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "delete-btn";
+        delBtn.textContent = "删除";
+        delBtn.dataset.id = msg.id;
+
+        // 编号和删除按钮放进同一个小区域，靠右显示
+        const actions = document.createElement("div");
+        actions.className = "message-actions";
+        actions.appendChild(id);
+        actions.appendChild(delBtn);
+
         head.appendChild(nickname);
-        head.appendChild(id);
+        head.appendChild(actions);
 
         const content = document.createElement("div");
         content.className = "message-content";
@@ -436,6 +471,34 @@
         showError("无法连接后端，请确认已运行：uvicorn main:app --reload");
       }
     }
+
+    /* ========== 删除留言 ==========
+       用"事件委托"：只在列表容器上装一个监听器，
+       不管以后渲染出多少条留言、多少个删除按钮，都能响应点击。
+    */
+    messageList.addEventListener("click", async function (event) {
+      const btn = event.target.closest(".delete-btn");
+      if (!btn) return;
+
+      // 先弹窗确认，防止手滑误删
+      if (!confirm("确定要删除这条留言吗？")) return;
+
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      btn.textContent = "删除中…";
+
+      try {
+        const res = await fetch(API_URL + "/" + id, { method: "DELETE" });
+        if (!res.ok) throw new Error("删除失败：" + res.status);
+        hideError();
+        // 删除成功后重新拉取列表，页面就和数据库保持一致了
+        await loadMessages();
+      } catch (err) {
+        showError("删除失败，请确认后端服务已启动");
+        btn.disabled = false;
+        btn.textContent = "删除";
+      }
+    });
 
     /* ========== 提交表单 ========== */
     form.addEventListener("submit", async function (event) {
