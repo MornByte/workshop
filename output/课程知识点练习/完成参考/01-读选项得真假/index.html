@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>读选项得真假 · 第 9 课</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>读选项得真假</h1>
+    <p>换一个基础选项，看看读到的拼音值和比较结果怎样变化。</p>
+    <div class="fields">
+      <label class="field-label" for="level">你的基础
+        <select id="level">
+          <option value="lingJiChu">零基础</option>
+          <option value="youDianJiChu">有点基础</option>
+        </select>
+      </label>
+    </div>
+    <button type="button" class="primary" id="read-button">读取基础</button>
+    <div class="result" aria-live="polite">
+      <dl>
+        <dt>读到的值</dt>
+        <dd id="read-level">还没读取</dd>
+        <dt>比较结果</dt>
+        <dd id="check-result">—</dd>
+      </dl>
+    </div>
+    <div class="age-practice" role="group" aria-label="年龄比较">
+      <p>输入 16，先猜两种比较的结果，再点按钮核对。</p>
+      <div class="fields">
+        <label class="field-label" for="age">年龄
+          <input id="age" type="number" value="16" inputmode="numeric">
+        </label>
+      </div>
+      <button type="button" class="primary" id="compare-age">比较年龄</button>
+      <div class="result" aria-live="polite">
+        <dl>
+          <dt>读到的值</dt>
+          <dd id="read-age">还没读取</dd>
+          <dt>宽松比较 <code>==</code></dt>
+          <dd id="loose-result">—</dd>
+          <dt>严格比较 <code>===</code></dt>
+          <dd id="strict-result">—</dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

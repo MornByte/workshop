@@ -1,0 +1,1261 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社团报名小助手 </title>
+  <style>
+    :root {
+      --ink: #19352c;
+      --heading: #163e32;
+      --muted: #4d6257;
+      --blue: #235a83;
+      --line: #cdd6c7;
+      --sky: #edf5fb;
+      --paper: #fffdf6;
+      --felt: #17463a;
+      --felt-edge: #467365;
+      --felt-rim: #0e3128;
+      --felt-ink: #fff3d5;
+      --felt-muted: #d1e4d7;
+      --card-gold: #ffd17a;
+      --card-green: #e5efc4;
+      --green: #19583e;
+      --green-bg: #e8f2d9;
+      --yellow: #6e430c;
+      --yellow-bg: #fff1ce;
+      --radius: 17px;
+      background: #f4f1e5;
+      color: var(--ink);
+      font: 20px/1.65 "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    [hidden] { display: none !important; }
+    main { width: min(1230px, calc(100% - 56px)); margin: 32px auto 70px; }
+    section { scroll-margin-top: 18px; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { color: var(--heading); line-height: 1.22; }
+    h1 { font-size: clamp(36px, 5.5vw, 70px); letter-spacing: -.065em; text-wrap: balance; }
+    h2 { font-size: clamp(30px, 3.4vw, 46px); letter-spacing: -.045em; text-wrap: balance; }
+    h3 { font-size: 23px; letter-spacing: -.025em; }
+    a { color: var(--blue); text-underline-offset: .22em; }
+    button, select, input { font: inherit; accent-color: var(--blue); }
+    button, select { cursor: pointer; }
+    :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+    :is(.hero, .demo) :focus-visible { outline-color: #92cfff; }
+
+    .felt {
+      border: 1px solid var(--felt-rim);
+      color: var(--felt-ink);
+      background-color: var(--felt);
+      background-image: radial-gradient(#efffc718 .75px, transparent 1.25px);
+      background-size: 8px 8px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+      align-items: center;
+      gap: clamp(22px, 4vw, 56px);
+      padding: clamp(23px, 4vw, 55px);
+      border-radius: 26px;
+      box-shadow: 0 6px 0 var(--felt-rim);
+    }
+
+    .hero h1, .demo h3 { color: var(--felt-ink); }
+    .hero-copy > p { max-width: 24em; margin-top: 14px; color: var(--felt-muted); }
+    .hero-copy .eyebrow {
+      margin: 0 0 12px;
+      color: var(--card-gold);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    .hero-actions { margin-top: 21px; }
+    .hero .start-link { display: inline-flex; align-items: center; text-decoration: none; }
+    .start-link::after { content: "↓"; margin-left: .6em; }
+    .hero-board {
+      position: relative;
+      margin: 0;
+      padding: clamp(16px, 2.4vw, 25px);
+      border: 1px solid #6d9582;
+      border-radius: 14px;
+      background: #102f26b5;
+      text-align: center;
+    }
+
+    .hero-board figcaption { font-size: 17px; font-weight: 700; color: var(--felt-muted); }
+    .card-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: clamp(5px, 1vw, 13px);
+      align-items: center;
+    }
+    .hero-board .card-row { margin: 14px 0 17px; }
+    .sample-card {
+      display: grid;
+      gap: 7px;
+      padding: 17px 6px;
+      border: 1px solid #d6ad69;
+      border-radius: 11px;
+      background: var(--card-gold);
+      color: #473111;
+      box-shadow: 0 5px 0 #071f18;
+      transform: rotate(-5deg);
+    }
+    .sample-card:last-child { background: #f1e7bf; border-color: #d7cda0; transform: rotate(5deg); }
+    .sample-card small { font-size: 15px; font-weight: 700; }
+    .sample-card strong { font-size: clamp(17px, 2vw, 24px); line-height: 1.3; }
+    .join-mark { color: var(--card-gold); font: 800 clamp(18px, 2.4vw, 29px)/1.2 "Microsoft YaHei", "PingFang SC", sans-serif; }
+    .sample-result {
+      padding: 7px 12px;
+      border: 3px double #728357;
+      border-radius: 8px;
+      background: var(--card-green);
+      color: var(--green);
+    }
+    .sample-result strong { display: block; font-size: 28px; line-height: 1.25; }
+    .sample-result span { font-size: 15px; }
+
+    .values { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; margin: 11px 0; }
+    .values dd { margin: 0; text-align: right; font-weight: 800; }
+
+    .section-nav { display: flex; flex-wrap: wrap; gap: 2px 20px; padding: 15px 0 12px; font-size: 16px; }
+    .section-nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 4px;
+      color: var(--heading);
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-color: #7f9b8c;
+    }
+    .section-nav a:hover { color: var(--blue); text-decoration-color: currentColor; }
+    .review, .topic, .project-notes { padding: clamp(28px, 4.6vw, 60px) 0; border-top: 1px solid var(--line); }
+    .topic-head {
+      padding-left: clamp(12px, 2vw, 22px);
+      border-left: 5px solid #4b8e74;
+    }
+
+    .review-head p, .topic-head p { margin-top: 9px; max-width: 42em; color: var(--muted); }
+    .review-head pre { width: fit-content; max-width: 100%; margin-bottom: 0; }
+    .review-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; margin: 15px 0; color: var(--muted); font-size: 16px; }
+    progress { width: 160px; height: 10px; accent-color: var(--green); }
+    #review-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .question {
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+      padding: clamp(14px, 2.4vw, 22px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    .question[data-current] { background: var(--sky); border-color: #86abc9; box-shadow: inset 4px 0 var(--blue); }
+    .question-title {
+      min-height: 44px;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--heading);
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .question-title .number { margin-right: .55em; color: var(--blue); }
+    .current-label {
+      display: none;
+      margin-left: .5em;
+      padding: 0 7px;
+      border-radius: 5px;
+      background: #d9eaf8;
+      color: var(--blue);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    [aria-current="true"] .current-label { display: inline-block; }
+    .answer-choices, .actions, .options { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+    .choice, .action, select {
+      min-height: 44px;
+      padding: 7px 13px;
+      border: 1px solid #9eafa2;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--heading);
+      line-height: 1.4;
+    }
+
+    .choice { min-width: 100px; text-align: left; }
+    .choice:hover, .action:hover { background: var(--sky); }
+    .choice b { margin-right: 8px; }
+    .choice[aria-pressed="true"], .action[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor; }
+    .primary { background: var(--card-gold); color: #3d2a0b; border-color: #c39448; font-weight: 800; }
+    .primary:hover { background: #ffe2a5; }
+    .choice[data-result="correct"], .correct { color: var(--green); background: var(--green-bg); border-color: #9dc9ab; }
+    .choice[data-result="wrong"], .wrong { color: var(--yellow); background: var(--yellow-bg); border-color: #e4c876; }
+    .answer-judgment { margin: 9px 0 5px; font-weight: 700; }
+    .answer-notes { display: grid; gap: 6px; font-size: 18px; }
+    .answer-notes p { padding: 6px 10px; border-left: 3px solid; border-radius: 4px; }
+    .answer-notes b { margin-right: 8px; }
+
+    .topic-head { margin-bottom: 22px; }
+    .compare .topic-head { border-left-color: #669a96; }
+    .recommend .topic-head { border-left-color: #5883a9; }
+    .boundary .topic-head { border-left-color: #b17a30; }
+    .demo-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); gap: 16px 24px; align-items: start; }
+    .code-stack { grid-column: 1; grid-row: 1; display: grid; gap: 12px; min-width: 0; }
+    .code-block, .project-step {
+      min-width: 0;
+      padding: clamp(15px, 2vw, 22px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      overflow-wrap: anywhere;
+    }
+
+    .code-block p { margin-top: 8px; }
+    pre {
+      margin: 10px 0;
+      padding: 11px 13px;
+      border: 1px solid #d9ddd0;
+      border-radius: 8px;
+      background: #f1f3e9;
+      color: #183b37;
+      font: 700 20px/1.55 "Microsoft YaHei", "PingFang SC", sans-serif;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    code { font: inherit; font-weight: 700; }
+    .code-line {
+      display: block;
+      width: 100%;
+      padding: 0 4px;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    button.code-line:hover { background: #e5edf1; }
+    .code-line[data-highlight] { background: #dcecf7; box-shadow: inset 3px 0 var(--blue); }
+    .demo {
+      grid-column: 2;
+      grid-row: 1;
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      padding: clamp(15px, 2vw, 24px);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 0 var(--felt-rim);
+      scroll-margin-top: 18px;
+      overflow-wrap: anywhere;
+    }
+    .demo > p { margin-top: 6px; color: var(--felt-muted); font-size: 18px; }
+    .demo[data-updated] { border-color: #a7c6ad; box-shadow: 0 4px 0 var(--felt-rim), 0 0 0 2px #9cbe9e; }
+    .updated-label {
+      position: absolute;
+      top: -12px;
+      right: 14px;
+      visibility: hidden;
+      padding: 0 8px;
+      border: 1px solid #a4b995;
+      border-radius: 6px;
+      background: var(--card-green);
+      color: var(--heading);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    [data-updated] > .updated-label { visibility: visible; }
+    .fields { display: flex; flex-wrap: wrap; gap: 10px 16px; margin: 11px 0; }
+    .field { display: grid; align-content: start; gap: 4px; font-size: 18px; font-weight: 700; }
+    fieldset { min-width: 0; margin: 10px 0; padding: 2px 9px 8px; border: 1px solid var(--felt-edge); border-radius: 9px; }
+    legend { padding: 0 4px; color: var(--felt-ink); font-size: 18px; font-weight: 700; }
+    .options { gap: 5px; }
+    .options label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      gap: 5px;
+      padding: 4px 8px;
+      border: 1px solid #6a9180;
+      border-radius: 7px;
+      background: #12362c;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .options label:has(input:checked) { background: var(--card-gold); color: var(--ink); border-color: var(--card-gold); }
+    .options input { width: 17px; height: 17px; margin: 0; }
+    .actions { margin-top: 11px; }
+    .result-box {
+      margin-top: 15px;
+      padding: 11px 14px;
+      border: 3px double #9eab83;
+      border-radius: 9px;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    .result-box .values { margin: 0; }
+    .result-box strong { color: var(--heading); }
+    .result-box strong[data-kind="pass"] { color: var(--green); }
+    .result-box strong[data-kind="warn"] { color: var(--yellow); }
+    .result-box p { min-height: 1.6em; }
+    .result-box p + p { margin-top: 3px; }
+    .result-box .minor, .field-hint { font-size: 16px; }
+    .result-box .values + p { margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--line); }
+    .field-hint { margin-top: 5px; color: #ffdfa0; font-weight: 700; }
+    .field-hint:empty { margin-top: 0; }
+    fieldset:has(.field-hint:not(:empty)) { border-color: #f7ce70; }
+    .boundary-result:has(#bound-status:empty):not(:has([data-club]:not([hidden]), [data-no-match]:not([hidden]))) { display: none; }
+    .priority { margin-top: 14px; }
+    .priority p { font-size: 17px; font-weight: 700; }
+    .priority .actions { margin-top: 6px; }
+    .priority .action { font-size: 16px; }
+    .priority .action[aria-pressed="true"] { background: var(--card-gold); color: var(--ink); border-color: var(--card-gold); }
+    .recommendations:has(> :not([hidden])) { margin-top: 9px; }
+    .club { padding: 9px 12px; border: 1px solid #a8cfb8; border-left: 4px solid #479c72; border-radius: 8px; background: var(--green-bg); }
+    .club h4 { margin: 0 0 2px; color: var(--green); font-size: 23px; }
+    .club p, .recommendations > p { font-size: 17px; }
+    .quick { grid-column: 1 / -1; }
+    .project-notes > p { margin: 10px 0 17px; }
+    .project-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .project-step ol { padding-inline-start: 1.25em; margin: 8px 0 0; font-size: 17px; }
+    .project-step li + li { margin-top: 5px; }
+    .ripple-toggle { display: none; font-size: 16px; }
+
+    .condition-row { margin: 16px 0 18px; }
+    .condition-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 5px 4px;
+      min-width: 0;
+      padding: clamp(8px, 1.5vw, 14px);
+      border: 1px solid #b7c6b7;
+      border-radius: 11px;
+      background: #e5e9dc;
+      color: var(--ink);
+      box-shadow: 0 4px 0 var(--felt-rim);
+      cursor: pointer;
+    }
+    .condition-card:has(input:checked) { background: var(--card-gold); border-color: #c49c54; }
+    .condition-card:hover { box-shadow: 0 4px 0 var(--felt-rim), 0 0 0 2px #fff1b7; }
+    .condition-card:has(input:focus-visible) { outline: 3px solid #92cfff; outline-offset: 3px; }
+    .condition-card input { width: 18px; height: 18px; margin: 2px 0 0; }
+    .condition-card code { align-self: center; font-size: 15px; }
+    .condition-card code, .condition-card .condition-value { grid-column: 1 / -1; }
+    .condition-card strong { font-size: clamp(17px, 2vw, 22px); }
+    .condition-value { color: var(--yellow); font-size: 24px; line-height: 1.2; font-weight: 800; }
+    .condition-card:has(input:checked) .condition-value { color: var(--green); }
+    .result-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 14px; }
+    .result-heading .label { color: var(--muted); font-size: 15px; font-weight: 700; }
+    .result-heading .verdict { display: block; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.25; }
+    .truth-chip {
+      display: grid;
+      justify-items: center;
+      padding: 3px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #edf2e3;
+    }
+    .truth-chip strong { font-size: 23px; line-height: 1.25; }
+    .qual-result .minor { margin-top: 7px; font-size: 17px; }
+    #compare-result { color: var(--green); font-size: 24px; }
+    #compare-result[data-kind="warn"] { color: var(--yellow); }
+
+    .rec-setup {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+      margin: 10px 0 12px;
+    }
+    .rec-setup fieldset { margin: 0; }
+    .rec-judge {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 9px;
+      align-items: start;
+    }
+    .rec-result { margin: 0; padding: 6px 10px; }
+    .rec-result > strong { color: var(--muted); font-size: 15px; }
+    .rec-result:has(.club:not([hidden])) { background: var(--card-green); }
+    .rec-result .recommendations { margin-top: 0; }
+    .rec-result .club { padding: 0; border: 0; background: transparent; }
+    .rule-order {
+      display: grid;
+      gap: 6px;
+      padding: 0;
+      margin: 12px 0;
+      list-style: none;
+      counter-reset: rule;
+    }
+    .rule-order li {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 10px;
+      padding: 7px 9px;
+      border: 1px solid #9db3a1;
+      border-radius: 7px;
+      background: #eef0e4;
+      color: var(--ink);
+      counter-increment: rule;
+    }
+    .rule-order li::before {
+      content: counter(rule);
+      min-width: 25px;
+      border-radius: 4px;
+      background: var(--felt);
+      color: var(--felt-ink);
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .rule-order li[data-branch="match"] { background: var(--card-green); border-color: #aac281; }
+    .rule-order li[data-branch="skip"] { background: #dde4d9; }
+    .rule-order small { display: block; color: #425b50; font-size: 15px; }
+    .rule-order [data-branch-label] { font-size: 15px; font-weight: 800; }
+    .rule-order li[data-branch="match"] [data-branch-label] { color: var(--green); }
+
+    .lecture-ripple { position: fixed; inset: 0; z-index: 5; overflow: clip; pointer-events: none; }
+    .lecture-ripple::before, .lecture-ripple::after {
+      content: "";
+      position: absolute;
+      top: var(--click-y);
+      left: var(--click-x);
+      width: clamp(205px, 49vw, 500px);
+      aspect-ratio: 1;
+      translate: -50% -50%;
+      border-radius: 50%;
+      scale: .12;
+      opacity: 0;
+      mask-image: radial-gradient(closest-side, transparent 70%, #000 83%, transparent);
+      animation: wave-expand 880ms ease-out both;
+    }
+
+    .lecture-ripple::before { background: #8fbea340; backdrop-filter: blur(1px); }
+    .lecture-ripple::after { background: #accdb441; animation-delay: 150ms; }
+    @keyframes wave-expand {
+      13% { opacity: .7; }
+      to { scale: 1; opacity: 0; }
+    }
+
+    @media (min-width: 841px) and (min-height: 820px) {
+      .demo { position: sticky; top: 18px; }
+    }
+
+    @media (max-width: 840px) {
+      main { width: calc(100% - 28px); margin-top: 14px; }
+      .hero, .demo-layout { grid-template-columns: minmax(0, 1fr); }
+      .demo, .code-stack { grid-column: auto; grid-row: auto; }
+      .hero-board { width: min(100%, 500px); }
+      .project-steps { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    @media (max-width: 420px) {
+      .hero { padding: 19px; }
+      .hero-board { padding: 12px; }
+      .section-nav { column-gap: 10px; }
+      .condition-card code { font-size: 13px; }
+      .rec-setup { grid-template-columns: minmax(0, 1fr); }
+      .rule-order li { column-gap: 6px; }
+      .rule-order small, .rule-order [data-branch-label] { font-size: 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ripple-toggle { display: inline-block; }
+      .lecture-ripple:not(.wave-enabled)::before {
+        animation: none;
+        scale: .22;
+        opacity: 1;
+        mask-image: none;
+        backdrop-filter: none;
+        background: radial-gradient(closest-side, #96bfab48, transparent);
+      }
+      .lecture-ripple:not(.wave-enabled)::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header class="hero felt">
+    <div class="hero-copy">
+      <p class="eyebrow">第 9 课 · 桌游规则卡</p>
+      <h1>社团报名小助手</h1>
+      <p>社团招新了。你想报机器人社，周三也能来，可你选的是「零基础」。网页会怎么回答？这节课我们做一个报名小助手，让网页按规则判断能不能报、推荐合适的社团，漏填时提醒你补上。</p>
+      <div class="actions hero-actions">
+        <a class="action primary start-link" href="#review">开始回顾</a>
+        <button class="action ripple-toggle" type="button" id="ripple-toggle" aria-pressed="false">启用水波动画</button>
+      </div>
+    </div>
+    <figure class="hero-board">
+      <figcaption>机器人社报名示例</figcaption>
+      <div class="card-row">
+        <div class="sample-card"><small>时间条件</small><strong>周三能来</strong></div>
+        <span class="join-mark">＋</span>
+        <div class="sample-card"><small>基础条件</small><strong>有点基础</strong></div>
+      </div>
+      <p class="sample-result"><strong>可以报</strong><span>两项条件都满足</span></p>
+    </figure>
+  </header>
+
+  <nav class="section-nav" aria-label="本页讲解">
+    <a href="#review">课前回顾</a>
+    <a href="#compare">比较与真假</a>
+    <a href="#qualification">资格条件</a>
+    <a href="#recommend">推荐结果</a>
+    <a href="#boundary">边界提示</a>
+    <a href="#project">做任务书</a>
+  </nav>
+
+  <section id="review" class="review" aria-labelledby="review-title">
+    <div class="review-head">
+      <h2 id="review-title">课前知识点回顾</h2>
+      <p>之前做搜索和按钮练习时，我们从控件读值，也用点击事件改过网页文字。这里把两步接起来。</p>
+      <pre><code>button.addEventListener("click", () =&gt; {
+  message.textContent = select.value;
+});</code></pre>
+    </div>
+    <div class="review-progress">
+      <progress id="review-progress" value="0" aria-label="课前回顾答题进度"></progress>
+      <span id="review-count" role="status"></span>
+    </div>
+    <div id="review-list"></div>
+  </section>
+
+  <section id="compare" class="topic compare" aria-labelledby="compare-title">
+    <header class="topic-head">
+      <h2 id="compare-title">你符合机器人社的基础要求吗？</h2>
+      <p>报名页要回答「能报机器人社吗？」时，得先核对基础。网页把你选的值和「有点基础」对应的值比一比，得到一个真假值。下一段再把它和「周三能来吗？」的结果合起来，判断能不能报。</p>
+      <p>先选「有点基础」，猜会得到真还是假，再点「读取基础」。换成「零基础」再试一次。看高亮的两行伪代码，哪一行在读选项，哪一行在做比较？</p>
+    </header>
+    <div class="demo-layout">
+      <div class="demo felt" id="compare-demo">
+        <span class="updated-label" aria-hidden="true">刚刚更新</span>
+        <h3>读取你的基础</h3>
+        <div class="fields">
+          <label class="field" for="compare-level">你的基础
+            <select id="compare-level">
+              <option value="lingJiChu">零基础</option>
+              <option value="youDianJiChu">有点基础</option>
+            </select>
+          </label>
+        </div>
+        <button type="button" class="action primary" id="read-level">读取基础</button>
+        <div class="result-box" role="status">
+          <dl class="values">
+            <dt>读到的值</dt><dd id="compare-value">—</dd>
+            <dt>比较结果</dt><dd id="compare-result">—</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="code-stack">
+        <div class="code-block">
+          <h3>读基础下拉框</h3>
+          <pre aria-label="中文伪代码"><code><button type="button" class="code-line" data-cue="compare-read">读出下拉框当前选项的值</button><span class="code-line">把这个值显示出来</span></code></pre>
+          <p>用 <code>.value</code> 读选项的值。选「有点基础」读到 <code>youDianJiChu</code>，选「零基础」读到 <code>lingJiChu</code>。</p>
+        </div>
+        <div class="code-block">
+          <h3>比较后得到真假</h3>
+          <pre aria-label="中文伪代码"><code><button type="button" class="code-line" data-cue="compare-judge">比较读到的值和「有点基础」的选项值</button><span class="code-line">相同就显示真，否则显示假</span></code></pre>
+          <p>JavaScript 写成 <code>jiChuZhi === "youDianJiChu"</code>。<code>jiChuZhi</code> 是刚读到的基础选项值。<code>===</code> 判断两边的值和类型是否都相同，得到 <code>true</code>（真）或 <code>false</code>（假）。这两个值叫布尔值。</p>
+        </div>
+      </div>
+      <div class="quick" id="check-compare"></div>
+    </div>
+  </section>
+
+  <section id="qualification" class="topic" aria-labelledby="qualification-title">
+    <header class="topic-head">
+      <h2 id="qualification-title">S9-1 · 判断报名资格</h2>
+      <p>两张条件牌一开始都勾上了。先猜取消「有点基础」还能不能报，再点牌验证。最后把这一项勾回来。</p>
+    </header>
+    <div class="demo-layout">
+      <div class="demo felt" id="qual-demo">
+        <span class="updated-label" aria-hidden="true">刚刚更新</span>
+        <h3>机器人社能报吗？</h3>
+        <div class="card-row condition-row" role="group" aria-label="报名条件牌">
+          <label class="condition-card" for="qual-day">
+            <strong id="qual-day-label">周三能来</strong>
+            <input type="checkbox" id="qual-day" aria-labelledby="qual-day-label" checked>
+            <code>zhouSan</code>
+            <span class="condition-value" id="qual-has-wed">true</span>
+          </label>
+          <code class="join-mark" aria-label="并且">&amp;&amp;</code>
+          <label class="condition-card" for="qual-level">
+            <strong id="qual-level-label">有点基础</strong>
+            <input type="checkbox" id="qual-level" aria-labelledby="qual-level-label" checked>
+            <code>youDianJiChu</code>
+            <span class="condition-value" id="qual-has-basics">true</span>
+          </label>
+        </div>
+        <div class="result-box qual-result" role="status">
+          <div class="result-heading">
+            <div>
+              <span class="label">资格结果</span>
+              <strong class="verdict" id="qual-status" data-kind="pass">可以报</strong>
+            </div>
+            <div class="truth-chip"><span class="label">能报名</span><strong id="qual-can-apply">true</strong></div>
+          </div>
+          <p id="qual-reason" class="minor">周三能来，而且有点基础。</p>
+        </div>
+      </div>
+      <div class="code-stack">
+        <div class="code-block">
+          <h3>把两个条件合在一起</h3>
+          <pre aria-label="中文伪代码"><code><button type="button" class="code-line" data-cue="qual-apply">能报名 ← 周三能来 并且 有点基础</button></code></pre>
+          <p>两张牌都为真，「能报名」才为真。箭头表示把这次判断的结果记下来。JavaScript 用 <code>&amp;&amp;</code> 表示「并且」。</p>
+        </div>
+        <div class="code-block">
+          <h3>按真假写给用户看</h3>
+          <pre aria-label="中文伪代码"><code><button type="button" class="code-line" data-cue="qual-pass">如果 能报名</button><span class="code-line">  显示「可以报」</span><button type="button" class="code-line" data-cue="qual-deny">否则</button><span class="code-line">  显示「不能报」和原因</span></code></pre>
+          <p>「能报名」为真时走第一条，为假时走「否则」。对应 JavaScript 里的 <code>if</code> 和 <code>else</code>。</p>
+        </div>
+      </div>
+      <div class="quick" id="check-qual"></div>
+    </div>
+  </section>
+
+  <section id="recommend" class="topic recommend" aria-labelledby="recommend-title">
+    <header class="topic-head">
+      <h2 id="recommend-title">S9-2 · 按顺序推荐一个社团</h2>
+      <p>勾周三和周五，选「有点基础」，点「看推荐」。接着点「合唱团优先」，看看哪张牌移到了最前面，哪条判断先成立。</p>
+      <p>如果你只有周二有空，网页会怎么推荐？取消其他日期，只勾周二，再点「看推荐」，看伪代码最后亮起哪一行。</p>
+    </header>
+    <div class="demo-layout">
+      <div class="demo felt" id="rec-demo">
+        <span class="updated-label" aria-hidden="true">刚刚更新</span>
+        <h3>哪个社团适合你？</h3>
+        <div class="rec-setup">
+          <fieldset>
+            <legend>能来的时间</legend>
+            <div class="options">
+              <label><input type="checkbox" value="zhouYi">周一</label>
+              <label><input type="checkbox" value="zhouEr">周二</label>
+              <label><input type="checkbox" value="zhouSan">周三</label>
+              <label><input type="checkbox" value="zhouWu">周五</label>
+            </div>
+          </fieldset>
+          <label class="field" for="rec-level">你的基础
+            <select id="rec-level">
+              <option value="lingJiChu">零基础</option>
+              <option value="youDianJiChu">有点基础</option>
+            </select>
+          </label>
+        </div>
+        <div class="rec-judge">
+          <button type="button" class="action primary" id="recommend-button">看推荐</button>
+          <div class="result-box rec-result" aria-live="polite">
+            <strong>推荐结果</strong>
+            <p id="rec-waiting">还没判断</p>
+            <div class="recommendations">
+              <article class="club" data-club="机器人社" hidden><h4>机器人社</h4><p>你勾选了周三，也选择了有点基础。</p></article>
+              <article class="club" data-club="合唱团" hidden><h4>合唱团</h4><p>你勾选了周五，合唱团周五排练。</p></article>
+              <article class="club" data-club="篮球社" hidden><h4>篮球社</h4><p>你勾选了周一，篮球社周一训练。</p></article>
+              <p data-no-match hidden>暂时没有匹配的社团。</p>
+            </div>
+          </div>
+        </div>
+        <div class="priority">
+          <p id="priority-title">调整前两条的顺序</p>
+          <div class="actions" role="group" aria-labelledby="priority-title">
+            <button type="button" class="action" data-order="robot" aria-pressed="true">机器人社优先</button>
+            <button type="button" class="action" data-order="choir" aria-pressed="false">合唱团优先</button>
+          </div>
+        </div>
+        <ol class="rule-order" id="rec-rules" role="list" aria-label="从上到下检查推荐规则">
+          <li data-rule="机器人社">
+            <span><strong>机器人社</strong><small>周三能来，而且有点基础</small></span>
+            <span data-branch-label>待判断</span>
+          </li>
+          <li data-rule="合唱团">
+            <span><strong>合唱团</strong><small>周五能来</small></span>
+            <span data-branch-label>待判断</span>
+          </li>
+          <li data-rule="篮球社">
+            <span><strong>篮球社</strong><small>周一能来</small></span>
+            <span data-branch-label>待判断</span>
+          </li>
+          <li data-rule="">
+            <span><strong>否则</strong><small>前面三条规则都不满足</small></span>
+            <span data-branch-label>待判断</span>
+          </li>
+        </ol>
+      </div>
+      <div class="code-stack">
+        <div class="code-block">
+          <h3>分别读多选框的勾选状态</h3>
+          <pre aria-label="中文伪代码"><code>分别查看三个活动日（周一、周三、周五）是否勾选
+勾上记为真，没勾记为假</code></pre>
+          <p>JavaScript 用 <code>.checked</code> 读取复选框的勾选状态。三个社团都不在周二活动。只勾周二时，三个活动日的勾选状态都是 <code>false</code>（假）。</p>
+        </div>
+        <div class="code-block">
+          <h3>找到第一张满足的规则牌就停</h3>
+          <pre aria-label="中文伪代码"><code><button type="button" class="code-line" id="rec-first" data-cue="rec-robot">如果 周三能来 并且 有点基础</button><span class="code-line" id="rec-first-result">  推荐机器人社</span><button type="button" class="code-line" id="rec-second" data-cue="rec-choir">否则如果 周五能来</button><span class="code-line" id="rec-second-result">  推荐合唱团</span><button type="button" class="code-line" data-cue="rec-basket">否则如果 周一能来</button><span class="code-line">  推荐篮球社</span><button type="button" class="code-line" data-cue="rec-empty">否则</button><span class="code-line">  显示「暂时没有匹配的社团」</span></code></pre>
+          <p>从上往下找，第一条成立后就跳过后面的规则。JavaScript 用 <code>else if</code> 表示「否则如果」。换顺序后，先检查的规则也跟着换。</p>
+          <p>前面三条都不成立时，才会执行最后的 <code>else</code>（否则），显示「暂时没有匹配的社团」。<code>else</code> 后面不用再写一个条件。</p>
+        </div>
+      </div>
+      <div class="quick" id="check-rec"></div>
+    </div>
+  </section>
+
+  <section id="boundary" class="topic boundary" aria-labelledby="boundary-title">
+    <header class="topic-head">
+      <h2 id="boundary-title">S9-3 · 缺项、冲突和重置</h2>
+      <p>先空着点一次，再选大二、有点基础，只勾周一。最后补勾周三，看报名结果和推荐区依次怎样变。</p>
+    </header>
+    <div class="demo-layout">
+      <div class="demo felt" id="boundary-demo">
+        <span class="updated-label" aria-hidden="true">刚刚更新</span>
+        <h3>试一遍完整判断</h3>
+        <form id="boundary-form">
+          <fieldset aria-describedby="bound-grade-hint">
+            <legend>你的年级</legend>
+            <div class="options">
+              <label><input type="radio" name="grade" value="大一">大一</label>
+              <label><input type="radio" name="grade" value="大二">大二</label>
+              <label><input type="radio" name="grade" value="大三">大三</label>
+            </div>
+            <p class="field-hint" id="bound-grade-hint" role="status"></p>
+          </fieldset>
+          <fieldset aria-describedby="bound-time-hint">
+            <legend>能来的时间</legend>
+            <div class="options">
+              <label><input type="checkbox" value="zhouYi">周一</label>
+              <label><input type="checkbox" value="zhouSan">周三</label>
+              <label><input type="checkbox" value="zhouWu">周五</label>
+            </div>
+            <p class="field-hint" id="bound-time-hint" role="status"></p>
+          </fieldset>
+          <fieldset aria-describedby="bound-level-hint">
+            <legend>你的基础</legend>
+            <div class="options">
+              <label><input type="radio" name="level" value="lingJiChu">零基础</label>
+              <label><input type="radio" name="level" value="youDianJiChu">有点基础</label>
+            </div>
+            <p class="field-hint" id="bound-level-hint" role="status"></p>
+          </fieldset>
+          <div class="fields">
+            <label class="field" for="bound-club">想报的社团
+              <select id="bound-club">
+                <option value="机器人社">机器人社</option>
+                <option value="合唱团">合唱团</option>
+                <option value="篮球社">篮球社</option>
+              </select>
+            </label>
+          </div>
+          <div class="actions">
+            <button type="button" class="action primary" id="judge-boundary">看看我能不能报</button>
+            <button type="reset" class="action">重置</button>
+          </div>
+        </form>
+        <div class="result-box boundary-result">
+          <div aria-live="polite">
+            <p><strong id="bound-status">还没判断</strong></p>
+            <p class="minor" id="bound-reason" hidden></p>
+          </div>
+          <div class="recommendations" aria-live="polite">
+            <article class="club" data-club="机器人社" hidden><h4>推荐 · 机器人社</h4><p>你勾选了周三，也选择了有点基础。</p></article>
+            <article class="club" data-club="合唱团" hidden><h4>推荐 · 合唱团</h4><p>你勾选了周五，合唱团周五排练。</p></article>
+            <article class="club" data-club="篮球社" hidden><h4>推荐 · 篮球社</h4><p>你勾选了周一，篮球社周一训练。</p></article>
+            <p data-no-match hidden>暂时没有匹配的社团。</p>
+          </div>
+        </div>
+      </div>
+      <div class="code-stack">
+        <div class="code-block">
+          <h3>两个地方漏选，就各提示一次</h3>
+          <pre aria-label="中文伪代码"><code><button type="button" class="code-line" data-cue="bound-grade">如果 没选年级，在年级下面写提示</button><button type="button" class="code-line" data-cue="bound-time">如果 没选时间，在时间下面写提示</button><button type="button" class="code-line" data-cue="bound-stop">如果 漏选了年级或时间，结束这次检查</button></code></pre>
+          <p>前两个「如果」各自检查一项，所以两项都漏选时会显示两条提示。提示写完，用 <code>return</code> 结束这次检查。</p>
+        </div>
+        <div class="code-block">
+          <h3>填了时间，再看有没有冲突</h3>
+          <pre aria-label="中文伪代码"><code><button type="button" class="code-line" data-cue="bound-conflict">如果 想报机器人社 并且 周三不能来</button><span class="code-line">  提示补勾周三，结束这次检查</span><button type="button" class="code-line" data-cue="bound-level">如果 想报机器人社 并且 没选基础</button><span class="code-line">  在基础下面写提示，结束这次检查</span></code></pre>
+          <p>先处理时间冲突。时间符合后，才检查基础。漏选基础会提示补选，选了「零基础」会说明为什么不能报。</p>
+        </div>
+        <div class="code-block">
+          <h3>重新判断时用本次选择</h3>
+          <pre aria-label="中文伪代码"><code><span class="code-line">清掉上一次的提示和推荐</span><button type="button" class="code-line" data-cue="bound-recommend">按这次的选项，显示资格和推荐结果</button><button type="button" class="code-line" data-cue="bound-clear">点「重置」，把表单和结果恢复到最初</button></code></pre>
+        </div>
+      </div>
+      <div class="quick" id="check-boundary"></div>
+    </div>
+  </section>
+
+  <section id="project" class="project-notes" aria-labelledby="project-title">
+    <h2 id="project-title">把规则带回你的 class9</h2>
+    <p>先写三行社团规则，每行写清楚社团名、时间、年级和基础要求。在同一个 <code>class9</code> 文件夹里用 <code>index.html</code>、<code>style.css</code>、<code>app.js</code> 累计完成三个任务。把写好的规则和测试条件告诉 AI，做完一关就在网页里点一遍，按任务书截图。</p>
+    <div class="project-steps">
+      <article class="project-step">
+        <h3>S9-1 · 资格条件</h3>
+        <ol>
+          <li>摆好年级、时间、基础、想报社团四组问题。</li>
+          <li>点按钮后先核对四组读到的值。</li>
+          <li>先只判时间，分别做一次通过和不通过。</li>
+          <li>加上基础要求，换三种组合核对结论和原因。</li>
+        </ol>
+      </article>
+      <article class="project-step">
+        <h3>S9-2 · 推荐结果</h3>
+        <ol>
+          <li>在结果下面准备三张社团卡。</li>
+          <li>用一条判断链决定推给谁。</li>
+          <li>理由引用勾选的时间或基础。</li>
+          <li>切换输入，核对只见一张卡或一句暂无匹配。</li>
+        </ol>
+      </article>
+      <article class="project-step">
+        <h3>S9-3 · 边界提示</h3>
+        <ol>
+          <li>空着点，核对提示是否贴在对应字段下面。</li>
+          <li>故意让时间冲突，读一遍改选建议。</li>
+          <li>重置后直接判断，再补全连点，检查有没有旧结果。</li>
+          <li>统一提示的位置和样式，切换输入核对主提示。</li>
+        </ol>
+      </article>
+    </div>
+  </section>
+</main>
+<script>
+  "use strict";
+
+  const byId = id => document.getElementById(id);
+  const letters = ["A", "B"];
+  const review = [
+    [
+      "找到段落。message 这个变量保存了什么？",
+      '<p id="message">等你点击</p>\nconst message = document.getElementById("message");',
+      ["段落元素", "段落里的文字"], 0,
+      "getElementById 用 id 找到页面里的段落元素。",
+      "要读出「等你点击」这几个字，可以再取 message.textContent。"
+    ],
+    [
+      "读输入框。keyword 是输入框，里面写着「海报」。用哪个属性读到这两个字？",
+      '// keyword 对应页面上的输入框\nconst word = keyword.?;',
+      [".textContent", ".value"], 1,
+      "输入框的当前内容放在 value 里。",
+      "textContent 读的是元素内部的文字，输入框当前输入的内容用 value 读取。"
+    ],
+    [
+      "变量的声明。代码执行到第二行会怎样？",
+      'const topic = "摄影";\ntopic = "篮球";',
+      ["topic 变成「篮球」", "重新赋值时报错"], 1,
+      "用 const 声明后，不能再把另一个值赋给 topic。",
+      "要给同一个变量重新赋值，可以用 let 声明它。"
+    ],
+    [
+      "点击事件。showTip 已经定义好，执行下面这行后，什么时候出现提示？",
+      'button.addEventListener("click", showTip);',
+      ["点击按钮时", "读到这行时立刻出现"], 0,
+      "click 事件发生后，浏览器才会调用绑定的 showTip。",
+      "这行在页面载入时只登记监听，直接写 showTip() 才会调用函数。"
+    ],
+    [
+      "替换文字。段落原来写着「等待」。执行后显示什么？",
+      'message.textContent = "完成";',
+      ["等待完成", "完成"], 1,
+      "给 textContent 赋值会把段落的文字换成「完成」。",
+      "「等待完成」需要把新文字接到原有文字后面，本行只赋入「完成」。"
+    ],
+    [
+      "给控件加标签。点击「姓名」时，希望焦点进输入框。for 应该填什么？",
+      '<label for="?">姓名</label>\n<input id="student-name" name="name">',
+      ["student-name", "name"], 0,
+      "label 的 for 要和控件的 id 一样。",
+      "name 给控件标记字段名，它没有把这段标签文字与输入框关联起来。"
+    ],
+    [
+      "运行这段代码时，clubSelect 下拉框的值是「摄影社」。运行后改选「机器人社」，再点击按钮，message 段落会显示什么？",
+      'const club = clubSelect.value;\n\nbutton.addEventListener("click", () => {\n  message.textContent = club;\n});',
+      ["摄影社", "机器人社"], 0,
+      "第一行先读取下拉框的值，把「摄影社」存进 club。点击时，程序用这个已经存下来的值更新段落。",
+      "「机器人社」是点击时下拉框的当前值。把读取 clubSelect.value 的语句移进点击函数，段落才会显示这个值。"
+    ],
+    [
+      "搜索里的包含。标题里有「海报」，这行会得到什么？",
+      '"社团海报墙".includes("海报")',
+      ["false", "true"], 1,
+      "includes() 找到连续的「海报」，结果就是 true。",
+      "标题还有别的字也没关系。只有找不到这段文字时，includes() 才返回 false。"
+    ]
+  ];
+
+  const quickChecks = [
+    ["check-compare", [
+      "文字「16」和数字 16，严格比较会得到什么？",
+      '比较 文字「16」和数字 16\n两边的值和类型都相同才为真',
+      ["true", "false"], 1,
+      "左边是文字，右边是数字，类型不同。",
+      "左右都用文字「16」时，值和类型才都相同，结果才是 true。"
+    ]],
+    ["check-qual", [
+      "周三能来，基础选的是「零基础」。「能报名」是真还是假？",
+      '周三能来为真\n有点基础为假\n能报名 ← 周三能来 并且 有点基础',
+      ["false", "true"], 0,
+      "「并且」需要两项都为真。基础这一项为假，报名判断也为假。",
+      "用「或者」才允许只满足一项就通过。本题要同时满足两项。"
+    ]],
+    ["check-rec", [
+      "两条都满足。周三和周五都勾了，也有点基础。按下面的顺序推荐谁？",
+      '如果 周三能来 并且 有点基础\n  推荐机器人社\n否则如果 周五能来\n  推荐合唱团',
+      ["合唱团", "机器人社"], 1,
+      "第一条已成立，机器人社先被选中，这条链在这里结束。",
+      "只有第一条不成立，程序才会检查周五并可能选合唱团。"
+    ]],
+    ["check-boundary", [
+      "两个字段都漏选。两条语句各写一条提示，最后会写出几条？",
+      '如果 没选年级，提示「请先选年级」\n如果 没选时间，提示「请至少选一个能来的时间」',
+      ["两条", "一条"], 0,
+      "这是两个独立的「如果」。两个条件都成立时，各写一条提示。",
+      "把第二个「如果」改成「否则如果」，前一条成立后就会跳过后一个判断。"
+    ]]
+  ];
+
+  function escapeHtml(value) {
+    return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  }
+
+  function addQuestion(host, id, question, label) {
+    const [prompt, code, options, correctIndex, rightReason, otherReason] = question;
+    const wrongIndex = 1 - correctIndex;
+    host.insertAdjacentHTML("beforeend", `
+      <article class="question" data-correct="${correctIndex}" aria-labelledby="${id}-title">
+        <h3 id="${id}-title"><button type="button" class="question-title"><span class="number">${label}</span>${escapeHtml(prompt)}<span class="current-label" aria-hidden="true">当前讲解</span></button></h3>
+        <pre><code>${escapeHtml(code)}</code></pre>
+        <div class="answer-choices" role="group" aria-labelledby="${id}-title">
+          ${options.map((option, index) => `<button type="button" class="choice" data-answer="${index}" aria-pressed="false"><b>${letters[index]}</b>${escapeHtml(option)}</button>`).join("")}
+        </div>
+        <div aria-live="polite">
+          <p class="answer-judgment" hidden></p>
+          <div class="answer-notes" hidden>
+            <p class="correct"><b>正确选项 ${letters[correctIndex]}</b>${escapeHtml(rightReason)}</p>
+            <p class="wrong"><b>错误选项 ${letters[wrongIndex]}</b>${escapeHtml(otherReason)}</p>
+          </div>
+        </div>
+      </article>`);
+  }
+
+  const reviewList = byId("review-list");
+  const progress = byId("review-progress");
+  const reviewCount = byId("review-count");
+  progress.max = review.length;
+  reviewCount.textContent = `已答 0 / ${progress.max} 题`;
+  review.forEach((question, index) => {
+    const number = String(index + 1).padStart(2, "0");
+    addQuestion(reviewList, `review-${number}`, question, number);
+  });
+  quickChecks.forEach(([id, question]) => addQuestion(byId(id), id, question, "随堂二选一"));
+
+  let currentQuestion;
+  document.querySelector("main").addEventListener("click", event => {
+    const question = event.target.closest(".question");
+    if (!question) return;
+    if (currentQuestion !== question) {
+      if (currentQuestion) {
+        currentQuestion.removeAttribute("data-current");
+        currentQuestion.querySelector(".question-title").removeAttribute("aria-current");
+      }
+      currentQuestion = question;
+      question.setAttribute("data-current", "");
+      question.querySelector(".question-title").setAttribute("aria-current", "true");
+    }
+
+    const choice = event.target.closest("[data-answer]");
+    if (!choice) return;
+    if (question.parentElement === reviewList && !question.hasAttribute("data-answered")) {
+      progress.value += 1;
+      reviewCount.textContent = `已答 ${progress.value} / ${progress.max} 题`;
+    }
+    question.setAttribute("data-answered", "");
+    const correct = question.dataset.correct;
+    for (const option of question.querySelectorAll("[data-answer]")) {
+      option.dataset.result = option.dataset.answer === correct ? "correct" : "wrong";
+      option.setAttribute("aria-pressed", String(option === choice));
+    }
+
+    const judgment = question.querySelector(".answer-judgment");
+    judgment.textContent = choice.dataset.answer === correct ? "选对了" : "选错了";
+    judgment.hidden = false;
+    question.querySelector(".answer-notes").hidden = false;
+  });
+
+  function clearHighlights() {
+    document.querySelectorAll(".code-line[data-highlight]").forEach(line => line.removeAttribute("data-highlight"));
+  }
+
+  let highlightTimer;
+  function highlight(lines, temporary) {
+    clearTimeout(highlightTimer);
+    clearHighlights();
+    lines.forEach(line => line.setAttribute("data-highlight", ""));
+    if (temporary) highlightTimer = setTimeout(clearHighlights, 2000);
+  }
+
+  document.querySelectorAll("button.code-line").forEach(line => {
+    line.addEventListener("click", () => highlight([line], false));
+  });
+
+  let updatedDemo;
+  function updateDemo(demo, ...cues) {
+    updatedDemo?.removeAttribute("data-updated");
+    updatedDemo = demo;
+    demo.setAttribute("data-updated", "");
+    highlight(cues.map(cue => document.querySelector(`[data-cue="${cue}"]`)), true);
+  }
+
+  const jiChuKuang = byId("compare-level");
+  byId("read-level").addEventListener("click", () => {
+    const jiChuZhi = jiChuKuang.value;
+    const youDianJiChu = jiChuZhi === "youDianJiChu";
+    byId("compare-value").textContent = jiChuZhi;
+    const result = byId("compare-result");
+    result.textContent = youDianJiChu;
+    result.dataset.kind = youDianJiChu ? "pass" : "warn";
+    updateDemo(byId("compare-demo"), "compare-read", "compare-judge");
+  });
+
+  const qualDemo = byId("qual-demo");
+  function showQualification() {
+    const zhouSan = byId("qual-day").checked;
+    const youDianJiChu = byId("qual-level").checked;
+    const nengBao = zhouSan && youDianJiChu;
+    byId("qual-has-wed").textContent = zhouSan;
+    byId("qual-has-basics").textContent = youDianJiChu;
+
+    const status = byId("qual-status");
+    const result = byId("qual-can-apply");
+    status.textContent = nengBao ? "可以报" : "不能报";
+    status.dataset.kind = nengBao ? "pass" : "warn";
+    result.textContent = nengBao;
+    result.dataset.kind = status.dataset.kind;
+
+    let reason = "周三能来，而且有点基础。";
+    if (!zhouSan) reason = "机器人社在周三活动。";
+    else if (!youDianJiChu) reason = "机器人社需要有点基础。";
+    byId("qual-reason").textContent = reason;
+    return nengBao;
+  }
+
+  qualDemo.addEventListener("change", () => {
+    const nengBao = showQualification();
+    updateDemo(qualDemo, "qual-apply", nengBao ? "qual-pass" : "qual-deny");
+  });
+  showQualification();
+
+  function readTimes(scope) {
+    return {
+      zhouYi: scope.querySelector('input[value="zhouYi"]').checked,
+      zhouSan: scope.querySelector('input[value="zhouSan"]').checked,
+      zhouWu: scope.querySelector('input[value="zhouWu"]').checked
+    };
+  }
+
+  function getRecommendation({ zhouSan, zhouWu, zhouYi }, youDianJiChu, choirFirst = false) {
+    let tuiJian;
+    if (choirFirst && zhouWu) {
+      tuiJian = "合唱团";
+    } else if (zhouSan && youDianJiChu) {
+      tuiJian = "机器人社";
+    } else if (zhouWu) {
+      tuiJian = "合唱团";
+    } else if (zhouYi) {
+      tuiJian = "篮球社";
+    } else {
+      tuiJian = "";
+    }
+    return tuiJian;
+  }
+
+  function showRecommendation(scope, recommended) {
+    for (const card of scope.querySelectorAll("[data-club]")) {
+      card.hidden = card.dataset.club !== recommended;
+    }
+    scope.querySelector("[data-no-match]").hidden = recommended !== "";
+  }
+
+  const recDemo = byId("rec-demo");
+  const orderButtons = recDemo.querySelectorAll("[data-order]");
+  const recRules = byId("rec-rules");
+  const recWaiting = byId("rec-waiting");
+  const recCues = { "机器人社": "rec-robot", "合唱团": "rec-choir", "篮球社": "rec-basket", "": "rec-empty" };
+  const branchLabels = { waiting: "待判断", match: "选中", miss: "不满足", skip: "跳过" };
+
+  function showRuleResults(recommended) {
+    const rules = Array.from(recRules.children);
+    const matchIndex = rules.findIndex(rule => rule.dataset.rule === recommended);
+    rules.forEach((rule, index) => {
+      let branch = "miss";
+      if (recommended === null) branch = "waiting";
+      else if (index === matchIndex) branch = "match";
+      else if (matchIndex !== -1 && index > matchIndex) branch = "skip";
+      rule.dataset.branch = branch;
+      rule.querySelector("[data-branch-label]").textContent = branchLabels[branch];
+    });
+  }
+
+  function showRecDemo() {
+    const choirFirst = recDemo.querySelector('[data-order="choir"]').getAttribute("aria-pressed") === "true";
+    const recommended = getRecommendation(readTimes(recDemo), byId("rec-level").value === "youDianJiChu", choirFirst);
+    recWaiting.hidden = true;
+    showRuleResults(recommended);
+    showRecommendation(recDemo, recommended);
+    updateDemo(recDemo, recCues[recommended]);
+  }
+
+  recDemo.addEventListener("change", () => {
+    recWaiting.hidden = false;
+    showRuleResults(null);
+    showRecommendation(recDemo, null);
+    if (updatedDemo === recDemo) {
+      recDemo.removeAttribute("data-updated");
+      clearHighlights();
+    }
+  });
+
+  byId("recommend-button").addEventListener("click", showRecDemo);
+  orderButtons.forEach(button => button.addEventListener("click", () => {
+    orderButtons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+    const choirFirst = button.dataset.order === "choir";
+    const firstClub = choirFirst ? "合唱团" : "机器人社";
+    recRules.prepend(recRules.querySelector(`[data-rule="${firstClub}"]`));
+    const first = byId("rec-first");
+    const second = byId("rec-second");
+    first.textContent = choirFirst ? "如果 周五能来" : "如果 周三能来 并且 有点基础";
+    first.dataset.cue = choirFirst ? "rec-choir" : "rec-robot";
+    second.textContent = choirFirst ? "否则如果 周三能来 并且 有点基础" : "否则如果 周五能来";
+    second.dataset.cue = choirFirst ? "rec-robot" : "rec-choir";
+    byId("rec-first-result").textContent = "  推荐" + firstClub;
+    byId("rec-second-result").textContent = "  推荐" + (choirFirst ? "机器人社" : "合唱团");
+    showRecDemo();
+  }));
+
+  const boundaryDemo = byId("boundary-demo");
+  const boundaryForm = byId("boundary-form");
+  const gradeHint = byId("bound-grade-hint");
+  const timeHint = byId("bound-time-hint");
+  const levelHint = byId("bound-level-hint");
+  const boundaryStatus = byId("bound-status");
+  const boundaryReason = byId("bound-reason");
+
+  function clearBoundaryFeedback() {
+    gradeHint.textContent = "";
+    timeHint.textContent = "";
+    levelHint.textContent = "";
+    boundaryStatus.textContent = "";
+    boundaryStatus.removeAttribute("data-kind");
+    boundaryReason.textContent = "";
+    boundaryReason.hidden = true;
+    showRecommendation(boundaryDemo, null);
+  }
+
+  function writeBoundaryResult(title, reason, kind) {
+    boundaryStatus.textContent = title;
+    boundaryStatus.dataset.kind = kind;
+    boundaryReason.textContent = reason;
+    boundaryReason.hidden = false;
+  }
+
+  byId("judge-boundary").addEventListener("click", () => {
+    clearBoundaryFeedback();
+    const selectedGrade = boundaryForm.querySelector('input[name="grade"]:checked');
+    const selectedLevel = boundaryForm.querySelector('input[name="level"]:checked');
+    const club = byId("bound-club").value;
+    const times = readTimes(boundaryForm);
+    const { zhouYi, zhouSan, zhouWu } = times;
+    const queNianJi = selectedGrade === null;
+    const queShiJian = !(zhouYi || zhouSan || zhouWu);
+
+    if (queNianJi) {
+      gradeHint.textContent = "请先选年级。";
+    }
+    if (queShiJian) {
+      timeHint.textContent = "请至少选一个能来的时间。";
+    }
+    if (queNianJi || queShiJian) {
+      const cues = ["bound-stop"];
+      if (queNianJi) cues.push("bound-grade");
+      if (queShiJian) cues.push("bound-time");
+      updateDemo(boundaryDemo, ...cues);
+      return;
+    }
+
+    if (club === "机器人社" && !zhouSan) {
+      const days = [zhouYi && "周一", zhouWu && "周五"].filter(Boolean).join("、");
+      writeBoundaryResult("时间冲突", `机器人社在周三，你选的是${days}。如果周三也能来，请勾上周三再试。`, "warn");
+      updateDemo(boundaryDemo, "bound-conflict");
+      return;
+    }
+
+    const queJiChu = selectedLevel === null;
+    if (club === "机器人社" && queJiChu) {
+      levelHint.textContent = "请先选基础。";
+      updateDemo(boundaryDemo, "bound-level");
+      return;
+    }
+
+    const youDianJiChu = selectedLevel?.value === "youDianJiChu";
+    const rule = {
+      "机器人社": { day: "周三", available: zhouSan },
+      "合唱团": { day: "周五", available: zhouWu },
+      "篮球社": { day: "周一", available: zhouYi }
+    }[club];
+
+    if (!rule.available) {
+      writeBoundaryResult(`不能报${club}`, `${club}在${rule.day}活动，你没有勾选这一天。`, "warn");
+    } else if (club === "机器人社" && !youDianJiChu) {
+      writeBoundaryResult("不能报机器人社", "机器人社需要有点基础。", "warn");
+    } else {
+      writeBoundaryResult(`可以报${club}`, club === "机器人社" ? "周三能来，而且有点基础。" : `你勾选了${rule.day}，符合活动时间。`, "pass");
+    }
+
+    const recommended = getRecommendation(times, youDianJiChu);
+    showRecommendation(boundaryDemo, recommended);
+    updateDemo(boundaryDemo, "bound-recommend");
+  });
+
+  boundaryForm.addEventListener("reset", () => {
+    clearBoundaryFeedback();
+    boundaryStatus.textContent = "还没判断";
+    updateDemo(boundaryDemo, "bound-clear");
+  });
+
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const ripple = document.createElement("div");
+  ripple.className = "lecture-ripple";
+  ripple.setAttribute("aria-hidden", "true");
+  byId("ripple-toggle").addEventListener("click", event => {
+    const enabled = ripple.classList.toggle("wave-enabled");
+    event.currentTarget.setAttribute("aria-pressed", String(enabled));
+    event.currentTarget.textContent = enabled ? "关闭水波动画" : "启用水波动画";
+  });
+
+  let rippleTimer;
+  document.addEventListener("click", event => {
+    if (!event.isTrusted || event.detail === 0) return;
+    clearTimeout(rippleTimer);
+    if (ripple.isConnected) {
+      ripple.remove();
+      // 连点时先结束旧动画，再把同一个覆盖层放回页面。
+      void document.body.offsetWidth;
+    }
+    ripple.style.setProperty("--click-x", `${event.clientX}px`);
+    ripple.style.setProperty("--click-y", `${event.clientY}px`);
+    document.body.append(ripple);
+    const staticGlow = reduceMotion.matches && !ripple.classList.contains("wave-enabled");
+    rippleTimer = setTimeout(() => ripple.remove(), staticGlow ? 300 : 1060);
+  });
+</script>
+</body>
+</html>

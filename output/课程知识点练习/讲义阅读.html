@@ -1,0 +1,379 @@
+<!doctype html>
+<!-- 由 build-guide.mjs 从 README.md 生成 -->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 9 课 · 社团报名小助手：代码知识点练习</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #173451; background: #eef7ff; font: 1rem/1.7 "Microsoft YaHei", "PingFang SC", sans-serif; }
+    main { width: min(67rem, calc(100% - 2rem)); margin: 2rem auto; }
+    .overview, section { padding: clamp(1rem, 4vw, 2rem); margin-bottom: 1.25rem; background: #fff; border: 1px solid #c9dff1; border-radius: 14px; }
+    h1, h2 { margin: 0 0 .75rem; line-height: 1.3; color: #173b74; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); }
+    h2 a { color: inherit; text-decoration: none; }
+    h2 a:hover { text-decoration: underline; }
+    a { color: #0059ae; text-underline-offset: .16em; }
+    a:focus-visible { outline: 2px solid #0068d8; outline-offset: 3px; }
+    table { width: 100%; table-layout: fixed; border-collapse: collapse; overflow-wrap: anywhere; }
+    th, td { padding: .5rem; text-align: left; border-bottom: 1px solid #d9e8f5; }
+    th { background: #edf6ff; }
+    th:nth-child(2) { width: 35%; }
+    ul, ol { padding-inline-start: 1.5rem; }
+    pre { padding: 1rem; overflow: auto; border: 1px solid #d9e8f5; border-radius: 8px; background: #f7fbff; }
+    code { font-family: Consolas, "Cascadia Code", monospace; }
+    section { scroll-margin-top: 1rem; overflow-wrap: anywhere; }
+    section:target { background: #f6fbff; border-color: #6ba8e0; box-shadow: 0 0 0 3px #cfe7fd; }
+    section:target h2 { color: #0059ae; }
+    main:has(section[id="01-读选项得真假"]:target) .overview a[href="#01-%E8%AF%BB%E9%80%89%E9%A1%B9%E5%BE%97%E7%9C%9F%E5%81%87"],
+main:has(section[id="02-判断报名资格"]:target) .overview a[href="#02-%E5%88%A4%E6%96%AD%E6%8A%A5%E5%90%8D%E8%B5%84%E6%A0%BC"],
+main:has(section[id="03-按顺序推荐"]:target) .overview a[href="#03-%E6%8C%89%E9%A1%BA%E5%BA%8F%E6%8E%A8%E8%8D%90"],
+main:has(section[id="04-缺项先提示"]:target) .overview a[href="#04-%E7%BC%BA%E9%A1%B9%E5%85%88%E6%8F%90%E7%A4%BA"] { color: #004f9b; background: #dceeff; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="overview"><h1>第 9 课 · 社团报名小助手：代码知识点练习</h1>
+<p>同样点「看看我能不能报」，换一项选择，网页就要给出不同结果。
+这一课从一个下拉框开始，练习把选项变成真假、把真假变成有理由的结论。</p>
+<p>你已经用过 <code>.value</code> 读取控件的值、用 <code>textContent</code> 更新页面。
+各题已备好页面和点击监听。复制本题的整个起始文件夹，在自己的副本里改 <code>app.js</code>。
+四题彼此独立，开始下一题时复制对应的新文件夹即可。
+先读中文伪代码，想清楚程序要做什么。再照「编写代码」里的 JavaScript 动手。</p>
+<p>点击目录里的题名可高亮对应练习。<a href="README.md">查看 Markdown 原稿</a></p>
+<table>
+<thead>
+<tr>
+<th>题目</th>
+<th>改好后能做什么</th>
+<th>起始版</th>
+<th>完成参考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="#01-%E8%AF%BB%E9%80%89%E9%A1%B9%E5%BE%97%E7%9C%9F%E5%81%87">01 · 读选项得真假</a></td>
+<td>用 <code>===</code> 比较下拉框读出的值</td>
+<td><a href="%E8%B5%B7%E5%A7%8B%E7%89%88/01-%E8%AF%BB%E9%80%89%E9%A1%B9%E5%BE%97%E7%9C%9F%E5%81%87/index.html">起始网页</a></td>
+<td><a href="%E5%AE%8C%E6%88%90%E5%8F%82%E8%80%83/01-%E8%AF%BB%E9%80%89%E9%A1%B9%E5%BE%97%E7%9C%9F%E5%81%87/index.html">完成参考</a></td>
+</tr>
+<tr>
+<td><a href="#02-%E5%88%A4%E6%96%AD%E6%8A%A5%E5%90%8D%E8%B5%84%E6%A0%BC">02 · 判断报名资格</a></td>
+<td>两个条件同时满足才通过，并说清失败原因</td>
+<td><a href="%E8%B5%B7%E5%A7%8B%E7%89%88/02-%E5%88%A4%E6%96%AD%E6%8A%A5%E5%90%8D%E8%B5%84%E6%A0%BC/index.html">起始网页</a></td>
+<td><a href="%E5%AE%8C%E6%88%90%E5%8F%82%E8%80%83/02-%E5%88%A4%E6%96%AD%E6%8A%A5%E5%90%8D%E8%B5%84%E6%A0%BC/index.html">完成参考</a></td>
+</tr>
+<tr>
+<td><a href="#03-%E6%8C%89%E9%A1%BA%E5%BA%8F%E6%8E%A8%E8%8D%90">03 · 按顺序推荐</a></td>
+<td>同时命中多条规则时，只推荐排在最前的社团</td>
+<td><a href="%E8%B5%B7%E5%A7%8B%E7%89%88/03-%E6%8C%89%E9%A1%BA%E5%BA%8F%E6%8E%A8%E8%8D%90/index.html">起始网页</a></td>
+<td><a href="%E5%AE%8C%E6%88%90%E5%8F%82%E8%80%83/03-%E6%8C%89%E9%A1%BA%E5%BA%8F%E6%8E%A8%E8%8D%90/index.html">完成参考</a></td>
+</tr>
+<tr>
+<td><a href="#04-%E7%BC%BA%E9%A1%B9%E5%85%88%E6%8F%90%E7%A4%BA">04 · 缺项先提示</a></td>
+<td>同时指出两处漏选，补齐后才出结论</td>
+<td><a href="%E8%B5%B7%E5%A7%8B%E7%89%88/04-%E7%BC%BA%E9%A1%B9%E5%85%88%E6%8F%90%E7%A4%BA/index.html">起始网页</a></td>
+<td><a href="%E5%AE%8C%E6%88%90%E5%8F%82%E8%80%83/04-%E7%BC%BA%E9%A1%B9%E5%85%88%E6%8F%90%E7%A4%BA/index.html">完成参考</a></td>
+</tr>
+</tbody></table>
+</div>
+    <section id="01-读选项得真假" tabindex="-1">
+    <h2><a href="#01-%E8%AF%BB%E9%80%89%E9%A1%B9%E5%BE%97%E7%9C%9F%E5%81%87">01 读选项得真假</a></h2>
+    <p>基础下拉框显示「零基础」和「有点基础」。<code>jiChuKuang.value</code> 读出当前选项的拼音值，
+分别是 <code>&quot;lingJiChu&quot;</code> 和 <code>&quot;youDianJiChu&quot;</code>。</p>
+<p><strong>中文伪代码</strong></p>
+<pre><code class="language-text">读出基础选项的值
+比较读到的值是否等于「有点基础」的选项值
+显示读到的值和比较结果
+</code></pre>
+<p><strong>编写代码</strong></p>
+<p>打开 <code>app.js</code>，在 <code>// 01 · 读取与比较</code> 下方写下面四行代码。
+以 <code>//</code> 开头的是注释，写给读代码的人看，JavaScript 运行时会跳过它们。</p>
+<pre><code class="language-js">// 用 .value 读出基础下拉框的选项值。
+const jiChuZhi = jiChuKuang.value;
+// 和「有点基础」的选项值比较，把真假存下来。
+const youDianJiChu = jiChuZhi === &quot;youDianJiChu&quot;;
+// 把拼音值显示在「读到的值」一栏。
+duDaoDeZhi.textContent = jiChuZhi;
+// 把真假显示在「比较结果」一栏。
+biJiaoJieGuo.textContent = youDianJiChu;
+</code></pre>
+<p>第一行把读到的文字存入 <code>jiChuZhi</code>。第二行用 <code>===</code> 比较值和类型，
+把 <code>true</code> 或 <code>false</code> 存入变量 <code>youDianJiChu</code>。这两个真假值叫布尔值。
+最后两行把读到的值和比较结果写到网页的两处结果里。</p>
+<p><strong>运行检查</strong></p>
+<table>
+<thead>
+<tr>
+<th>选择基础后点击「读取基础」</th>
+<th>读到的值</th>
+<th>比较结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>有点基础</td>
+<td><code>youDianJiChu</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td>零基础</td>
+<td><code>lingJiChu</code></td>
+<td><code>false</code></td>
+</tr>
+</tbody></table>
+<p>把比较右边的 <code>&quot;youDianJiChu&quot;</code> 暂时改为 <code>&quot;lingJiChu&quot;</code>。
+保存刷新，再做同样两次操作。读到的拼音值仍对应你的选择，两个真假结果互换。
+观察完恢复原来的比较值。</p>
+<p>接着在同一页试试年龄输入框。即使设置了 <code>type=&quot;number&quot;</code>，输入 16 后，<code>.value</code> 读到的也是字符串 <code>&quot;16&quot;</code>。
+脚本已把它存进 <code>nianLingZhi</code>。在 <code>app.js</code> 的 <code>// 01 · 比较两种等号</code> 下方写两行，把读到的值分别用 <code>==</code> 和 <code>===</code> 与数字 16 比较。</p>
+<pre><code class="language-js">// 宽松比较会把年龄字符串转成数字，显示比较结果。
+kuanSongJieGuo.textContent = nianLingZhi == 16;
+// 严格比较保留年龄字符串的类型，显示比较结果。
+yanGeJieGuo.textContent = nianLingZhi === 16;
+</code></pre>
+<ul>
+<li><code>=</code> 把右边的值存到左边。两行代码都用它把比较结果写到网页上。</li>
+<li><code>==</code> 是宽松相等。类型不同时，它可能先转换再比较。本题会把字符串 <code>&quot;16&quot;</code> 转成数字 <code>16</code> 再比较。</li>
+<li><code>===</code> 是严格相等。类型和值都相同才为真。本题左边是字符串，右边是数字，结果为假。</li>
+</ul>
+<p>保存并刷新。在年龄输入框里分别输入 16 和 17，每次先猜，再点「比较年龄」。</p>
+<table>
+<thead>
+<tr>
+<th>输入年龄</th>
+<th>读到的值</th>
+<th><code>== 16</code></th>
+<th><code>=== 16</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>16</td>
+<td><code>&quot;16&quot;</code></td>
+<td><code>true</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>&quot;17&quot;</code></td>
+<td><code>false</code></td>
+<td><code>false</code></td>
+</tr>
+</tbody></table>
+<p>再把第二行的 <code>=== 16</code> 改为 <code>=== &quot;16&quot;</code>，保存刷新后输入 16 并点「比较年龄」。
+这次两个结果都是 <code>true</code>。严格比较的两边现在都是字符串 <code>&quot;16&quot;</code>。观察完恢复 <code>=== 16</code>。</p>
+<p><strong>常见错误</strong></p>
+<ul>
+<li>带引号的 <code>&quot;youDianJiChu&quot;</code> 是选项里的文字。直接写 <code>youDianJiChu</code> 表示存放真假的变量。</li>
+</ul>
+
+  </section>
+<section id="02-判断报名资格" tabindex="-1">
+    <h2><a href="#02-%E5%88%A4%E6%96%AD%E6%8A%A5%E5%90%8D%E8%B5%84%E6%A0%BC">02 判断报名资格</a></h2>
+    <p>机器人社要求「周三能来」并且「有点基础」。脚本已算好两个真假值。
+<code>zhouSan</code> 表示选中的是不是周三，<code>youDianJiChu</code> 表示是否有点基础。</p>
+<p><strong>中文伪代码</strong></p>
+<pre><code class="language-text">如果 周三能来 并且 有点基础
+  显示「可以报」和理由
+否则如果 周三不能来
+  说明机器人社在周三活动
+否则
+  说明机器人社需要有点基础
+</code></pre>
+<p><strong>编写代码</strong></p>
+<ol>
+<li>在 <code>app.js</code> 的 <code>// 02 · 组合条件</code> 下方写第一行，把两项合起来。</li>
+</ol>
+<pre><code class="language-js">// 周三能来且有点基础，报名资格才为真。
+const nengBao = zhouSan &amp;&amp; youDianJiChu;
+</code></pre>
+<p><code>&amp;&amp;</code> 读作「并且」。两边都为 <code>true</code> 时，<code>nengBao</code> 才是 <code>true</code>。</p>
+<ol start="2">
+<li>紧接着写判断链。<code>if (nengBao)</code> 处理通过，<code>else if (!zhouSan)</code> 处理周三不能来，
+<code>else</code> 处理剩下的情况。三个分支都用 <code>jieGuo.textContent</code> 更新结果区。</li>
+</ol>
+<pre><code class="language-js">// 报名资格为真，进入这个分支。
+if (nengBao) {
+  // 在结果区显示可以报名，并给出理由。
+  jieGuo.textContent = &quot;可以报。周三能来，而且有点基础。&quot;;
+// 报名资格为假时，先检查是不是周三不能来。
+} else if (!zhouSan) {
+  // 告诉用户哪个活动日没对上。
+  jieGuo.textContent = &quot;不能报。机器人社在周三活动。&quot;;
+// 周三能来却没通过，说明基础不符合要求。
+} else {
+  // 在结果区说明缺少哪项基础条件。
+  jieGuo.textContent = &quot;不能报。机器人社需要有点基础。&quot;;
+// 报名资格判断结束。
+}
+</code></pre>
+<p><strong>运行检查</strong></p>
+<table>
+<thead>
+<tr>
+<th>能来的时间</th>
+<th>基础</th>
+<th>点击「判断资格」后的结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>周三</td>
+<td>有点基础</td>
+<td>可以报。周三能来，而且有点基础。</td>
+</tr>
+<tr>
+<td>周三</td>
+<td>零基础</td>
+<td>不能报。机器人社需要有点基础。</td>
+</tr>
+<tr>
+<td>周一</td>
+<td>有点基础</td>
+<td>不能报。机器人社在周三活动。</td>
+</tr>
+<tr>
+<td>周一</td>
+<td>零基础</td>
+<td>不能报。机器人社在周三活动。</td>
+</tr>
+</tbody></table>
+<p><strong>常见错误</strong></p>
+<ul>
+<li>如果只满足一项也通过，检查是否把 <code>&amp;&amp;</code> 写成了 <code>||</code>。<code>||</code> 允许两项里至少一项成立就通过。</li>
+<li>两项都不满足时，本题先告诉用户活动时间。把缺基础的分支放在前面会改变这组测试的提示。</li>
+</ul>
+
+  </section>
+<section id="03-按顺序推荐" tabindex="-1">
+    <h2><a href="#03-%E6%8C%89%E9%A1%BA%E5%BA%8F%E6%8E%A8%E8%8D%90">03 按顺序推荐</a></h2>
+    <p>时间可以多勾几天。复选框的 <code>.checked</code> 是当前有没有勾选，直接得到真假值。
+脚本已经用它读好 <code>zhouYi</code>（周一）、<code>zhouSan</code>（周三）、<code>zhouWu</code>（周五）。
+<code>youDianJiChu</code> 表示基础下拉框选的是不是「有点基础」。
+同一个人可能同时符合几家社团。按下面的顺序，找到第一个满足的条件就停。</p>
+<p><strong>中文伪代码</strong></p>
+<pre><code class="language-text">如果 周三能来 并且 有点基础，推荐机器人社
+否则如果 周五能来，推荐合唱团
+否则如果 周一能来，推荐篮球社
+否则，显示「暂时没有匹配的社团」
+</code></pre>
+<p><strong>编写代码</strong></p>
+<ol>
+<li>在 <code>app.js</code> 的 <code>// 03 · 按顺序推荐</code> 下方写一条判断链。用 <code>if</code> 写第一条，
+用两个 <code>else if</code> 写中间两条，最后用 <code>else</code> 处理都没命中。</li>
+<li>条件成立时用 <code>=</code> 把对应的社团名存进 <code>tuiJian</code>，
+都没命中时存入空字符串 <code>&quot;&quot;</code>。预置的 <code>xianShiTuiJian(tuiJian)</code>
+会根据你给的值显示对应卡片，或显示「暂时没有匹配的社团」。</li>
+</ol>
+<pre><code class="language-js">// 先检查周三能来、同时有点基础。
+if (zhouSan &amp;&amp; youDianJiChu) {
+  // 把机器人社记为要显示的推荐。
+  tuiJian = &quot;机器人社&quot;;
+// 上一条不成立时，检查周五能不能来。
+} else if (zhouWu) {
+  // 把合唱团记为要显示的推荐。
+  tuiJian = &quot;合唱团&quot;;
+// 前两条都不成立时，检查周一能不能来。
+} else if (zhouYi) {
+  // 把篮球社记为要显示的推荐。
+  tuiJian = &quot;篮球社&quot;;
+// 前面三条都不成立，走到「否则」。
+} else {
+  // 存入空字符串，供显示函数提示暂无匹配。
+  tuiJian = &quot;&quot;;
+// 推荐判断结束，后面的显示函数会读取 tuiJian。
+}
+</code></pre>
+<p><strong>运行检查</strong></p>
+<table>
+<thead>
+<tr>
+<th>勾选时间</th>
+<th>基础</th>
+<th>点击「看推荐」后的结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>周三、周五</td>
+<td>有点基础</td>
+<td>只显示机器人社，理由提到周三和有点基础</td>
+</tr>
+<tr>
+<td>周三、周五</td>
+<td>零基础</td>
+<td>只显示合唱团，理由提到周五</td>
+</tr>
+<tr>
+<td>周一</td>
+<td>零基础</td>
+<td>只显示篮球社，理由提到周一</td>
+</tr>
+<tr>
+<td>周三</td>
+<td>零基础</td>
+<td>显示「暂时没有匹配的社团」，没有卡片</td>
+</tr>
+</tbody></table>
+<p>再试顺序对调。把 <code>if</code> 改为判断 <code>zhouWu</code> 并写入合唱团，
+把第一个 <code>else if</code> 改为判断 <code>zhouSan &amp;&amp; youDianJiChu</code> 并写入机器人社。
+保存后重试第一行，页面只推荐合唱团。观察后恢复原顺序，连点五次核对卡片数量仍是 1。</p>
+<p><strong>常见错误</strong></p>
+<ul>
+<li>写成三个独立的 <code>if</code> 时，后面成立的分支还会执行，可能覆盖前面写好的社团。</li>
+<li>都没命中时，留给显示函数的值应当是 <code>&quot;&quot;</code>。显示函数用它决定何时显示「暂时没有匹配的社团」。</li>
+</ul>
+
+  </section>
+<section id="04-缺项先提示" tabindex="-1">
+    <h2><a href="#04-%E7%BC%BA%E9%A1%B9%E5%85%88%E6%8F%90%E7%A4%BA">04 缺项先提示</a></h2>
+    <p>网页要先知道年级和能来的时间。点一次按钮，可能两组都漏选，也可能只漏选一组。
+这时应把每个提示写到对应问题下面。两组填好后才判断时间是否符合本题的报名规则。</p>
+<p><code>biaoDan.querySelector(&#39;input[name=&quot;nianJi&quot;]:checked&#39;)</code> 在表单里找选中的年级。
+<code>[name=&quot;nianJi&quot;]</code> 限定年级组，<code>:checked</code> 限定选中的单选框。
+找不到元素时得到 <code>null</code>，表示这一次没有选中年级。
+脚本已算好 <code>queNianJi</code>（没选年级）和 <code>queShiJian</code>（没选时间）。
+每次点击时，脚本先清空旧提示和结果，再执行你写的判断。</p>
+<p><strong>中文伪代码</strong></p>
+<pre><code class="language-text">如果 没选年级，在年级下方写提示
+如果 没选时间，在时间下方写提示
+如果 两项里至少漏选一项，结束本次检查
+</code></pre>
+<p><strong>编写代码</strong></p>
+<p>在 <code>app.js</code> 的 <code>// 04 · 缺项提示</code> 下方，
+分别用两个 <code>if</code> 处理年级和时间。两个判断各做各的，两项都少时两条提示都能写出来。
+最后用 <code>||</code> 检查是否至少缺一项。有缺项就用 <code>return</code> 结束这一次点击处理。</p>
+<pre><code class="language-js">// 年级没选时，执行下面的提示。
+if (queNianJi) {
+  // 在年级选项下面写一条提示。
+  nianJiTiShi.textContent = &quot;请先选年级。&quot;;
+// 年级检查结束，接着检查时间。
+}
+// 时间没选时，执行下面的提示。
+if (queShiJian) {
+  // 在时间选项下面写一条提示。
+  shiJianTiShi.textContent = &quot;请至少选一个能来的时间。&quot;;
+// 时间检查结束，两处提示都已检查完。
+}
+// 年级或时间少一项，就进入这个分支。
+if (queNianJi || queShiJian) {
+  // 结束本次点击处理，先等用户补齐。
+  return;
+// 两项都填好了，才继续下面的资格判断。
+}
+</code></pre>
+<p><strong>运行检查</strong></p>
+<ol>
+<li>两组保持空白，点「检查报名条件」。年级和时间下方各出现一条提示，结论区是空的。</li>
+<li>只选高二再点。年级提示消失，时间提示仍在，结论区还是空的。</li>
+<li>勾周一再点。两个提示都消失，结论是「不能报。活动安排在周三。」改勾周三再点，得到「可以报。周三能参加活动。」</li>
+<li>取消时间选择再点。时间提示重新出现，上一次的「可以报」已清掉。</li>
+<li>点「重置」后，原输入和提示清空，结论区显示「还没判断」。再直接点检查，看到步骤 1 的结果。</li>
+</ol>
+<p><strong>常见错误</strong></p>
+<ul>
+<li>第二条提示写成 <code>else if</code> 时，年级缺项会抢先执行，时间漏选就没有提示。</li>
+<li>页面先显示提示又马上写出结论，检查 <code>return</code> 有没有写在资格判断之前。</li>
+</ul>
+
+  </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>按顺序推荐 · 第 9 课</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>按顺序推荐</h1>
+    <p>勾选你能来的时间，按社团规则找出最先满足的一家。</p>
+    <fieldset>
+      <legend>能来的时间</legend>
+      <div class="options">
+        <label><input type="checkbox" id="zhouYi"> 周一</label>
+        <label><input type="checkbox" id="zhouSan"> 周三</label>
+        <label><input type="checkbox" id="zhouWu"> 周五</label>
+      </div>
+    </fieldset>
+    <div class="fields">
+      <label class="field-label" for="level">你的基础
+        <select id="level">
+          <option value="lingJiChu">零基础</option>
+          <option value="youDianJiChu">有点基础</option>
+        </select>
+      </label>
+    </div>
+    <button type="button" class="primary" id="recommend-button">看推荐</button>
+    <section class="result" aria-labelledby="result-title" aria-live="polite">
+      <h2 id="result-title">推荐结果</h2>
+      <p id="waiting">还没判断</p>
+      <p id="no-match" hidden>暂时没有匹配的社团</p>
+      <article class="club" id="robot" hidden>
+        <h3>机器人社</h3>
+        <p>你勾选了周三，也选择了有点基础。</p>
+      </article>
+      <article class="club" id="choir" hidden>
+        <h3>合唱团</h3>
+        <p>你勾选了周五，合唱团周五排练。</p>
+      </article>
+      <article class="club" id="basket" hidden>
+        <h3>篮球社</h3>
+        <p>你勾选了周一，篮球社周一训练。</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

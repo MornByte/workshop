@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>判断报名资格 · 第 9 课</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>判断报名资格</h1>
+    <p>机器人社只接收周三能来、同时有点基础的同学。</p>
+    <div class="fields">
+      <label class="field-label" for="day">能来的时间
+        <select id="day">
+          <option value="zhouYi">周一</option>
+          <option value="zhouSan">周三</option>
+        </select>
+      </label>
+      <label class="field-label" for="level">你的基础
+        <select id="level">
+          <option value="lingJiChu">零基础</option>
+          <option value="youDianJiChu">有点基础</option>
+        </select>
+      </label>
+    </div>
+    <button type="button" class="primary" id="judge-button">判断资格</button>
+    <section class="result" aria-labelledby="result-title">
+      <h2 id="result-title">报名资格</h2>
+      <p id="message" class="message" role="status">还没判断</p>
+    </section>
+  </main>
+</body>
+</html>

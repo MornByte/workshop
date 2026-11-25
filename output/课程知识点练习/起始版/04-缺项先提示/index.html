@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>缺项先提示 · 第 9 课</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>缺项先提示</h1>
+    <p>先选年级和时间，再检查能不能参加周三的活动。</p>
+    <form id="signup">
+      <fieldset aria-describedby="grade-hint">
+        <legend>你的年级</legend>
+        <div class="options">
+          <label><input type="radio" name="nianJi" value="gaoYi"> 高一</label>
+          <label><input type="radio" name="nianJi" value="gaoEr"> 高二</label>
+          <label><input type="radio" name="nianJi" value="gaoSan"> 高三</label>
+        </div>
+        <p id="grade-hint" class="field-hint" role="status"></p>
+      </fieldset>
+      <fieldset aria-describedby="time-hint">
+        <legend>能来的时间</legend>
+        <div class="options">
+          <label><input type="checkbox" id="zhouYi"> 周一</label>
+          <label><input type="checkbox" id="zhouSan"> 周三</label>
+        </div>
+        <p id="time-hint" class="field-hint" role="status"></p>
+      </fieldset>
+      <div class="actions">
+        <button type="button" class="primary" id="check-button">检查报名条件</button>
+        <button type="reset">重置</button>
+      </div>
+    </form>
+    <section class="result" aria-labelledby="result-title">
+      <h2 id="result-title">报名结论</h2>
+      <p id="message" class="message" role="status">还没判断</p>
+    </section>
+  </main>
+</body>
+</html>
